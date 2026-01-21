@@ -1,0 +1,66 @@
+<mat-sidenav-container class="shell">
+
+  <!-- ✅ SIDENAV: solo desktop -->
+    <mat-sidenav
+        class="sidenav"
+        mode="side"
+        opened
+        class="desktop-only"
+    >
+
+    <div class="brand">
+      <div class="logo">MC</div>
+      <div class="brand-text">
+        <div class="title">MiCartera</div>
+        <div class="subtitle">Gestor de Créditos</div>
+      </div>
+    </div>
+
+    <mat-nav-list>
+      <a mat-list-item routerLink="/dashboard" routerLinkActive="active">
+        <mat-icon>dashboard</mat-icon>
+        <span>Dashboard</span>
+      </a>
+
+      <a mat-list-item routerLink="/clientes" routerLinkActive="active">
+        <mat-icon>people</mat-icon>
+        <span>Clientes</span>
+      </a>
+
+      <a mat-list-item routerLink="/creditos" routerLinkActive="active">
+        <mat-icon>request_quote</mat-icon>
+        <span>Créditos</span>
+      </a>
+
+      <a mat-list-item routerLink="/pagos" routerLinkActive="active">
+        <mat-icon>payments</mat-icon>
+        <span>Pagos</span>
+      </a>
+    </mat-nav-list>
+  </mat-sidenav>
+
+  <mat-sidenav-content class="content">
+
+    <!-- ✅ TOPBAR (desktop + móvil). En móvil la hacemos compacta -->
+    <mat-toolbar class="topbar" color="primary" [class.mobile]="(isMobile$ | async)">
+      <span class="app-title">MiCartera</span>
+      <span class="spacer"></span>
+
+      <button mat-icon-button aria-label="Notificaciones">
+        <mat-icon>notifications</mat-icon>
+      </button>
+      <button mat-icon-button aria-label="Perfil">
+        <mat-icon>account_circle</mat-icon>
+      </button>
+    </mat-toolbar>
+
+    <!-- ✅ CONTENT: en móvil agregamos padding abajo por el bottom-nav -->
+    <main class="page" [class.has-bottom-nav]="(isMobile$ | async)">
+      <router-outlet></router-outlet>
+    </main>
+
+    <!-- ✅ BOTTOM NAV: SOLO móvil -->
+    <app-bottom-nav class="mobile-only"></app-bottom-nav>
+
+  </mat-sidenav-content>
+</mat-sidenav-container>

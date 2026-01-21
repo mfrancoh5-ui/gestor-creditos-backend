@@ -1,0 +1,67 @@
+<h2 mat-dialog-title>Nuevo cliente</h2>
+
+<div mat-dialog-content class="content">
+  <form [formGroup]="form" class="grid">
+    <mat-form-field appearance="outline">
+      <mat-label>Nombres</mat-label>
+      <input matInput formControlName="nombres" />
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Apellidos</mat-label>
+      <input matInput formControlName="apellidos" />
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full">
+      <mat-label>DPI (13 dígitos)</mat-label>
+      <input matInput formControlName="dpi" maxlength="13" />
+    </mat-form-field>
+
+    <div class="full block">
+      <div class="block-title">
+        Teléfonos
+        <button mat-stroked-button type="button" (click)="addTelefono()">
+          <mat-icon>add</mat-icon> Agregar
+        </button>
+      </div>
+
+      <div formArrayName="telefonos" class="stack">
+        <div class="row" *ngFor="let t of telefonos.controls; let i = index">
+          <mat-form-field appearance="outline" class="grow">
+            <mat-label>Teléfono {{ i + 1 }}</mat-label>
+            <input matInput [formControlName]="i" />
+          </mat-form-field>
+          <button mat-icon-button type="button" (click)="removeTelefono(i)" [disabled]="telefonos.length===1">
+            <mat-icon>delete</mat-icon>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="full block">
+      <div class="block-title">
+        Direcciones
+        <button mat-stroked-button type="button" (click)="addDireccion()">
+          <mat-icon>add</mat-icon> Agregar
+        </button>
+      </div>
+
+      <div formArrayName="direcciones" class="stack">
+        <div class="row" *ngFor="let d of direcciones.controls; let i = index">
+          <mat-form-field appearance="outline" class="grow">
+            <mat-label>Dirección {{ i + 1 }}</mat-label>
+            <input matInput [formControlName]="i" />
+          </mat-form-field>
+          <button mat-icon-button type="button" (click)="removeDireccion(i)" [disabled]="direcciones.length===1">
+            <mat-icon>delete</mat-icon>
+          </button>
+        </div>
+      </div>
+    </div>
+  </form>
+</div>
+
+<div mat-dialog-actions align="end">
+  <button mat-button (click)="cerrar()">Cancelar</button>
+  <button mat-flat-button color="primary" (click)="guardar()">Guardar</button>
+</div>

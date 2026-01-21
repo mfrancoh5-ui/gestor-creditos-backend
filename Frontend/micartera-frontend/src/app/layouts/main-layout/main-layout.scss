@@ -1,0 +1,101 @@
+.shell {
+  height: 100vh;
+  background: #f7f7fb;
+}
+
+/* =====================
+   SIDENAV (DESKTOP)
+===================== */
+.sidenav {
+  width: 280px;
+  border-right: 1px solid rgba(0, 0, 0, 0.08);
+  background: #fff;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+}
+
+.logo {
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  display: grid;
+  place-items: center;
+  font-weight: 800;
+  background: rgba(0, 0, 0, 0.08);
+}
+
+.brand-text .title {
+  font-weight: 800;
+  line-height: 1.1;
+}
+
+.brand-text .subtitle {
+  font-size: 12px;
+  opacity: 0.7;
+}
+
+/* =====================
+   CONTENT
+===================== */
+.content {
+  background: #f7f7fb;
+}
+
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: #fff;
+}
+
+.spacer {
+  flex: 1;
+}
+
+.page {
+  padding: 16px;
+}
+
+/* espacio para bottom nav */
+.page.has-bottom-nav {
+  padding-bottom: 84px;
+}
+
+/* =====================
+   ACTIVE LINK
+===================== */
+a.active {
+  background: rgba(0, 0, 0, 0.06);
+  border-radius: 10px;
+}
+
+/* =====================
+   RESPONSIVE
+===================== */
+.desktop-only {
+  display: block;
+}
+
+.mobile-only {
+  display: none;
+}
+
+/* MOBILE FIRST */
+@media (max-width: 768px) {
+  .desktop-only {
+    display: none;
+  }
+
+  .mobile-only {
+    display: block;
+  }
+
+  .page {
+    padding: 12px;
+  }
+}

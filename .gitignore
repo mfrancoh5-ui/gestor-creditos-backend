@@ -1,0 +1,38 @@
+# =========================
+# Global
+# =========================
+.DS_Store
+Thumbs.db
+*.log
+
+# Env / secrets
+.env
+**/.env
+.env.*
+!.env.example
+
+# =========================
+# Backend (Nest)
+# =========================
+Backend/node_modules/
+Backend/dist/
+Backend/coverage/
+Backend/.nestjs/
+Backend/*.tsbuildinfo
+
+# Prisma
+Backend/prisma/*.db
+Backend/prisma/*.sqlite
+Backend/prisma/*.sqlite3
+
+# =========================
+# Frontend (Angular)
+# =========================
+Frontend/micartera-frontend/node_modules/
+Frontend/micartera-frontend/dist/
+Frontend/micartera-frontend/.angular/
+Frontend/micartera-frontend/coverage/
+
+# IDE
+.vscode/
+.idea/

@@ -1,0 +1,124 @@
+generator client {
+  provider = "prisma-client-js"
+  engineType = "binary"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+enum FrecuenciaCredito {
+  DAILY // diario (incluye domingos)
+  BIWEEKLY // quincenal (cada 15 días)
+  MONTHLY // mensual
+  YEARLY // anual
+}
+
+enum EstadoCredito {
+  ACTIVE
+  PAID
+  LATE
+  CANCELED
+}
+
+enum EstadoCuota {
+  PENDING
+  PARTIAL
+  PAID
+  LATE
+}
+
+model Cliente {
+  id        Int     @id @default(autoincrement())
+  nombres   String  @db.VarChar(120)
+  apellidos String  @db.VarChar(120)
+  telefono  String? @db.VarChar(30)
+  dni       String? @unique @db.VarChar(30)
+  direccion String? @db.VarChar(255)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  creditos Credito[]
+}
+
+model Credito {
+  id Int @id @default(autoincrement())
+
+  clienteId Int
+  cliente   Cliente @relation(fields: [clienteId], references: [id], onDelete: Restrict)
+
+  // Datos pactados / entrada del cobrador
+  montoPrestado Decimal @db.Decimal(12, 2)
+
+  // Modo 1 (default): cuota pactada
+  // Modo 2: cuota calculada, pero se guarda como "cuota pactada final"
+  cuotaBase Decimal @db.Decimal(12, 2)
+
+  // % de interés (si el usuario lo ingresa en modo 2) o calculado (modo 1)
+  tasaInteresPct Decimal @db.Decimal(6, 2)
+
+  // Totales calculados por backend
+  totalInteres Decimal @db.Decimal(12, 2)
+  totalPagar   Decimal @db.Decimal(12, 2)
+
+  // Plan
+  frecuencia       FrecuenciaCredito
+  numeroCuotas     Int
+  fechaInicio      DateTime
+  fechaCulminacion DateTime
+
+  estado      EstadoCredito @default(ACTIVE)
+  observacion String?       @db.VarChar(255)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  cuotas Cuota[]
+
+  @@index([clienteId])
+  @@index([estado])
+  @@index([fechaInicio])
+}
+
+model Cuota {
+  id Int @id @default(autoincrement())
+
+  creditoId Int
+  credito   Credito @relation(fields: [creditoId], references: [id], onDelete: Cascade)
+
+  numero    Int
+  fechaVenc DateTime
+
+  monto Decimal @db.Decimal(12, 2)
+  saldo Decimal @db.Decimal(12, 2)
+
+  estado EstadoCuota @default(PENDING)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  pagos Pago[]
+
+  @@unique([creditoId, numero])
+  @@index([creditoId])
+  @@index([fechaVenc])
+  @@index([estado])
+}
+
+model Pago {
+  id Int @id @default(autoincrement())
+
+  cuotaId Int
+  cuota   Cuota @relation(fields: [cuotaId], references: [id], onDelete: Cascade)
+
+  monto     Decimal  @db.Decimal(12, 2)
+  fechaPago DateTime @default(now())
+  nota      String?  @db.VarChar(255)
+
+  createdAt DateTime @default(now())
+
+  @@index([cuotaId])
+  @@index([fechaPago])
+}

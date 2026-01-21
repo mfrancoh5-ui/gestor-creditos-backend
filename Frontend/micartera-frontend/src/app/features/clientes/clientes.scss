@@ -1,0 +1,153 @@
+.header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 14px;
+
+  h1 { margin: 0; font-weight: 900; }
+  p  { margin: 4px 0 0; opacity: 0.75; max-width: 44ch; }
+}
+
+.header-text { min-width: 0; }
+
+.card {
+  background: white;
+  border-radius: 14px;
+  padding: 10px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.06);
+  overflow: auto;
+}
+
+.table { width: 100%; min-width: 900px; }
+
+.empty {
+  padding: 18px;
+  opacity: 0.7;
+}
+
+/* =========================
+   Mobile cards (default)
+========================= */
+.cards {
+  display: grid;
+  gap: 12px;
+}
+
+.client-card {
+  display: block;
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 10px 22px rgba(0,0,0,0.08);
+  padding: 12px;
+  text-decoration: none;
+  color: inherit;
+}
+
+.card-top {
+  display: grid;
+  grid-template-columns: 44px 1fr auto;
+  gap: 12px;
+  align-items: center;
+}
+
+.avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  display: grid;
+  place-items: center;
+  font-weight: 900;
+  background: rgba(0,0,0,0.06);
+}
+
+.info {
+  min-width: 0;
+}
+
+.name {
+  font-weight: 900;
+  line-height: 1.1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.meta {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-top: 4px;
+  opacity: 0.85;
+}
+
+.badge {
+  font-size: 11px;
+  font-weight: 800;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: rgba(0,0,0,0.06);
+}
+
+.mono {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-size: 12px;
+}
+
+.card-body {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(0,0,0,0.06);
+  display: grid;
+  gap: 8px;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 44px 1fr;
+  gap: 10px;
+  align-items: baseline;
+}
+
+.row.small { opacity: 0.9; }
+
+.label {
+  font-size: 12px;
+  font-weight: 800;
+  opacity: 0.7;
+}
+
+.value {
+  font-size: 13px;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.muted { opacity: 0.7; margin-left: 6px; }
+
+.icon-danger mat-icon { opacity: 0.8; }
+.icon-danger:hover mat-icon { opacity: 1; }
+
+.fab {
+  position: fixed;
+  right: 16px;
+  bottom: calc(84px + env(safe-area-inset-bottom)); // arriba del bottom-nav
+  z-index: 30;
+}
+
+/* Desktop-only elements */
+.table-wrap { display: none; }
+.btn-desktop { display: none; }
+
+/* =========================
+   Desktop breakpoint
+========================= */
+@media (min-width: 960px) {
+  .cards { display: none; }
+  .table-wrap { display: block; }
+  .btn-desktop { display: inline-flex; }
+  .fab { display: none; }
+}
+    
