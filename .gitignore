@@ -4,12 +4,19 @@
 .DS_Store
 Thumbs.db
 *.log
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
 
-# Env / secrets
+# =========================
+# Environment & Secrets
+# =========================
 .env
-**/.env
 .env.*
 !.env.example
+!.env.*.example
+.env.local
+.env.*.local
 
 # =========================
 # Backend (Nest)
@@ -19,11 +26,18 @@ Backend/dist/
 Backend/coverage/
 Backend/.nestjs/
 Backend/*.tsbuildinfo
+Backend/**/*.tsbuildinfo
+Backend/.temp/
+Backend/.tmp/
 
 # Prisma
 Backend/prisma/*.db
 Backend/prisma/*.sqlite
 Backend/prisma/*.sqlite3
+Backend/prisma/dev.db
+
+# Lock files (keep only ONE per package manager)
+Backend/pnpm-lock.yaml
 
 # =========================
 # Frontend (Angular)
@@ -32,7 +46,42 @@ Frontend/micartera-frontend/node_modules/
 Frontend/micartera-frontend/dist/
 Frontend/micartera-frontend/.angular/
 Frontend/micartera-frontend/coverage/
+Frontend/micartera-frontend/pnpm-lock.yaml
 
-# IDE
-.vscode/
+# =========================
+# IDEs & Editors
+# =========================
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
 .idea/
+*.sublime-workspace
+*.swp
+*.swo
+*~
+
+# =========================
+# OS & Artifacts
+# =========================
+.DS_Store
+Thumbs.db
+.project
+.classpath
+.c9/
+pids/
+*.pid
+*.seed
+*.pid.lock
+
+# =========================
+# Testing
+# =========================
+/coverage
+/.nyc_output
+
+# Build artifacts
+.cache/
+.turbo/
+.swc/
