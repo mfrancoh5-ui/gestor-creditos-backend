@@ -8,6 +8,10 @@ export const envSchema = z.object({
   DB_USER: z.string().min(1),
   DB_PASSWORD: z.string().min(1),
   DB_NAME: z.string().min(1),
+
+  JWT_SECRET: z.string().default('your-secret-key-change-in-production'),
+  JWT_EXPIRATION: z.string().default('24h'),
+  JWT_REFRESH_EXPIRATION: z.string().default('7d'),
 });
 
 export type Env = z.infer<typeof envSchema>;

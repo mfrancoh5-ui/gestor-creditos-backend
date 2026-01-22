@@ -29,6 +29,28 @@ enum EstadoCuota {
   LATE
 }
 
+enum RolUsuario {
+  ADMIN
+  COBRADOR
+  VIEWER
+}
+
+model Usuario {
+  id               Int       @id @default(autoincrement())
+  email            String    @unique @db.VarChar(120)
+  passwordHash     String
+  nombres          String    @db.VarChar(120)
+  rol              RolUsuario @default(VIEWER)
+  clienteId        Int?
+  refreshTokenHash String?
+  activo           Boolean   @default(true)
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  @@index([email])
+  @@index([activo])
+}
+
 model Cliente {
   id        Int     @id @default(autoincrement())
   nombres   String  @db.VarChar(120)
