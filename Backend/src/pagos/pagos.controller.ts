@@ -9,6 +9,8 @@ import {
   HttpCode,
   HttpStatus,
   Query,
+  BadRequestException,
+  DefaultValuePipe,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -37,124 +39,108 @@ export class PagosController {
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({
     summary: 'Registrar pago',
-    description: 'Crea un nuevo pago y actualiza el saldo de la cuota (transacción atómica)',
+    description:
+      'Crea un nuevo pago y actualiza el saldo de la cuota (transacción atómica)',
   })
   @ApiBody({
     type: CrearPagoDto,
     schema: {
       example: {
+        // Puede venir cuotaId o creditoId (según su service)
         cuotaId: 1,
+        // creditoId: 1,
         monto: 150.5,
         nota: 'Pago realizado en banco',
+        fecha: '2026-01-28',
+        metodo: 'EFECTIVO',
+        referencia: 'ABC123',
+        observacion: 'Sin novedad',
       },
     },
   })
-  @ApiResponse({
-    status: 201,
-    description: 'Pago registrado exitosamente',
-    schema: {
-      example: {
-        success: true,
-        statusCode: 201,
-        data: {
-          id: 1,
-          cuotaId: 1,
-          monto: 150.5,
-          nota: 'Pago realizado en banco',
-          fecha: '2025-01-22T11:05:00.000Z',
-        },
-        message: 'Pago registrado',
-        timestamp: '2025-01-22T11:05:00.000Z',
-        path: '/pagos',
-      },
-    },
-  })
-  @ApiResponse({
-    status: 400,
-    description: 'Monto inválido o cuota no encontrada',
-  })
+  @ApiResponse({ status: 201, description: 'Pago registrado exitosamente' })
+  @ApiResponse({ status: 400, description: 'Monto inválido o datos inválidos' })
   async registrarPago(@Body() dto: CrearPagoDto) {
     return this.pagosService.registrarPago(dto);
   }
 
+  // ✅ LISTADO: por crédito (si viene creditoId) o general paginado (si no viene)
   @Get()
   @Roles('ADMIN', 'COBRADOR', 'VIEWER')
   @ApiOperation({
-    summary: 'Listar pagos por crédito',
-    description: 'Obtiene todos los pagos registrados para un crédito específico',
+    summary: 'Listar pagos (general) o por crédito',
+    description:
+      'Si envía creditoId, lista pagos de ese crédito. Si NO envía creditoId, lista pagos generales paginados con búsqueda opcional (q).',
   })
   @ApiQuery({
     name: 'creditoId',
-    type: 'number',
-    description: 'ID del crédito',
+    required: false,
+    type: Number,
+    description: 'ID del crédito (opcional). Si se envía, lista por crédito.',
     example: 1,
   })
-  @ApiResponse({
-    status: 200,
-    description: 'Pagos listados',
-    schema: {
-      example: {
-        success: true,
-        statusCode: 200,
-        data: [
-          {
-            id: 1,
-            cuotaId: 1,
-            monto: 150.5,
-            nota: 'Pago realizado',
-            fecha: '2025-01-22T11:05:00.000Z',
-          },
-        ],
-        message: 'Pagos listados',
-        timestamp: '2025-01-22T11:10:00.000Z',
-        path: '/pagos?creditoId=1',
-      },
-    },
+  @ApiQuery({
+    name: 'page',
+    required: false,
+    type: Number,
+    description: 'Página (solo para listado general)',
+    example: 1,
   })
-  @ApiResponse({
-    status: 400,
-    description: 'creditoId inválido o no proporcionado',
+  @ApiQuery({
+    name: 'limit',
+    required: false,
+    type: Number,
+    description: 'Límite por página (solo para listado general)',
+    example: 10,
   })
-  async listarPorCredito(@Query('creditoId', ParseIntPipe) creditoId: number) {
-    return this.pagosService.listarPorCredito(creditoId);
+  @ApiQuery({
+    name: 'q',
+    required: false,
+    type: String,
+    description:
+      'Búsqueda (solo para listado general): cliente, DNI, IDs, nota.',
+    example: 'marconi',
+  })
+  @ApiResponse({ status: 200, description: 'Pagos listados' })
+  @ApiResponse({ status: 400, description: 'Parámetros inválidos' })
+  async listar(
+    @Query('creditoId') creditoIdRaw?: string,
+    @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number = 1,
+    @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit: number = 10,
+    @Query('q') q?: string,
+  ) {
+    // Modo A: Por crédito (compatibilidad con su endpoint anterior)
+    if (creditoIdRaw !== undefined && creditoIdRaw !== null && creditoIdRaw !== '') {
+      const creditoId = Number(creditoIdRaw);
+      if (!Number.isFinite(creditoId) || creditoId <= 0) {
+        throw new BadRequestException('creditoId inválido');
+      }
+      return this.pagosService.listarPorCredito(creditoId);
+    }
+
+    // Modo B: General paginado
+    return this.pagosService.listarGeneral({
+      page,
+      limit,
+      q: q?.trim() || undefined,
+    });
   }
 
   @Get('balance/:creditoId')
   @Roles('ADMIN', 'COBRADOR', 'VIEWER')
   @ApiOperation({
     summary: 'Obtener balance de crédito',
-    description: 'Retorna el balance actual de un crédito (saldo pagado, pendiente, etc)',
+    description:
+      'Retorna el balance actual de un crédito (saldo total, saldo vencido, próxima cuota, etc.)',
   })
   @ApiParam({
     name: 'creditoId',
-    type: 'number',
+    type: Number,
     description: 'ID del crédito',
     example: 1,
   })
-  @ApiResponse({
-    status: 200,
-    description: 'Balance obtenido',
-    schema: {
-      example: {
-        success: true,
-        statusCode: 200,
-        data: {
-          creditoId: 1,
-          montoPrincipal: 5000,
-          montoPagado: 1500,
-          montoPendiente: 3500,
-          porcentajePago: 30,
-        },
-        message: 'Balance obtenido',
-        timestamp: '2025-01-22T11:15:00.000Z',
-        path: '/pagos/balance/1',
-      },
-    },
-  })
-  @ApiResponse({
-    status: 404,
-    description: 'Crédito no encontrado',
-  })
+  @ApiResponse({ status: 200, description: 'Balance obtenido' })
+  @ApiResponse({ status: 404, description: 'Crédito no encontrado' })
   async obtenerBalance(@Param('creditoId', ParseIntPipe) creditoId: number) {
     return this.pagosService.obtenerBalance(creditoId);
   }

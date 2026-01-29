@@ -1,1 +1,157 @@
-<p>dashboard works!</p>
+<div class="dashboard-container" *ngIf="!loading">
+  <!-- Page Header -->
+  <div class="page-header">
+    <h1>Dashboard</h1>
+    <p class="subtitle">Resumen de tu cartera de créditos</p>
+  </div>
+
+  <!-- KPI Cards -->
+  <div class="kpi-grid">
+    <!-- Total Clientes -->
+    <mat-card class="kpi-card">
+      <mat-card-content>
+        <div class="kpi-icon">
+          <mat-icon>people</mat-icon>
+        </div>
+        <div class="kpi-content">
+          <p class="kpi-label">Total de Clientes</p>
+          <p class="kpi-value">{{ stats.totalClientes }}</p>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Créditos Activos -->
+    <mat-card class="kpi-card">
+      <mat-card-content>
+        <div class="kpi-icon">
+          <mat-icon>credit_card</mat-icon>
+        </div>
+        <div class="kpi-content">
+          <p class="kpi-label">Créditos Activos</p>
+          <p class="kpi-value">{{ stats.creditosActivos }}</p>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Monto Desembolsado -->
+    <mat-card class="kpi-card">
+      <mat-card-content>
+        <div class="kpi-icon">
+          <mat-icon>attach_money</mat-icon>
+        </div>
+        <div class="kpi-content">
+          <p class="kpi-label">Monto Desembolsado</p>
+          <p class="kpi-value">Q {{ stats.montoDesembolsado.toLocaleString() }}</p>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Recaudación del Mes -->
+    <mat-card class="kpi-card">
+      <mat-card-content>
+        <div class="kpi-icon">
+          <mat-icon>trending_up</mat-icon>
+        </div>
+        <div class="kpi-content">
+          <p class="kpi-label">Recaudación Mes</p>
+          <p class="kpi-value">Q {{ stats.recaudacionMes.toLocaleString() }}</p>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Morosidad -->
+    <mat-card class="kpi-card morosidad">
+      <mat-card-content>
+        <div class="kpi-icon">
+          <mat-icon>warning</mat-icon>
+        </div>
+        <div class="kpi-content">
+          <p class="kpi-label">Morosidad</p>
+          <p class="kpi-value">{{ getMorosidadPercentage() }}</p>
+          <p class="kpi-status">{{ getMorosidadStatus() }}</p>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <!-- Data Grid Section -->
+  <div class="grid-section">
+    <!-- Recent Clientes -->
+    <mat-card>
+      <mat-card-header>
+        <mat-card-title>Clientes Recientes</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="table-wrapper">
+          <table mat-table [dataSource]="recentClientes" class="data-table">
+            <ng-container matColumnDef="nombre">
+              <th mat-header-cell *matHeaderCellDef>Nombre</th>
+              <td mat-cell *matCellDef="let element">{{ element.nombre }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="dni">
+              <th mat-header-cell *matHeaderCellDef>DNI</th>
+              <td mat-cell *matCellDef="let element">{{ element.dni }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="email">
+              <th mat-header-cell *matHeaderCellDef>Email</th>
+              <td mat-cell *matCellDef="let element">{{ element.email }}</td>
+            </ng-container>
+
+            <tr
+              mat-header-row
+              *matHeaderRowDef="['nombre', 'dni', 'email']"
+            ></tr>
+            <tr mat-row *matRowDef="let row; columns: ['nombre', 'dni', 'email']"></tr>
+          </table>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Recent Créditos -->
+    <mat-card>
+      <mat-card-header>
+        <mat-card-title>Créditos Recientes</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="table-wrapper">
+          <table mat-table [dataSource]="recentCreditos" class="data-table">
+            <ng-container matColumnDef="id">
+              <th mat-header-cell *matHeaderCellDef>#</th>
+              <td mat-cell *matCellDef="let element">{{ element.id }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="monto">
+              <th mat-header-cell *matHeaderCellDef>Monto</th>
+              <td mat-cell *matCellDef="let element">
+                Q {{ element.monto.toLocaleString() }}
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="estado">
+              <th mat-header-cell *matHeaderCellDef>Estado</th>
+              <td mat-cell *matCellDef="let element">
+                <span class="status-badge" [class]="element.estado">
+                  {{ element.estado }}
+                </span>
+              </td>
+            </ng-container>
+
+            <tr
+              mat-header-row
+              *matHeaderRowDef="['id', 'monto', 'estado']"
+            ></tr>
+            <tr mat-row *matRowDef="let row; columns: ['id', 'monto', 'estado']"></tr>
+          </table>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div>
+
+<!-- Loading State -->
+<div *ngIf="loading" class="loading-container">
+  <mat-spinner diameter="50"></mat-spinner>
+  <p>Cargando dashboard...</p>
+</div>

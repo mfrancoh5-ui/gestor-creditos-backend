@@ -1,0 +1,83 @@
+.login-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  font-family: 'Roboto', sans-serif;
+}
+
+.login-card {
+  width: 100%;
+  max-width: 400px;
+  padding: 32px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+  border-radius: 8px;
+}
+
+.login-title {
+  margin: 0;
+  font-size: 28px;
+  font-weight: 700;
+  color: #333;
+  text-align: center;
+}
+
+.login-subtitle {
+  margin: 8px 0 0 0;
+  font-size: 14px;
+  color: #666;
+  text-align: center;
+}
+
+.full-width {
+  width: 100%;
+  margin-bottom: 16px;
+}
+
+.error-message {
+  background-color: #ffebee;
+  color: #c62828;
+  padding: 12px;
+  border-radius: 4px;
+  margin-bottom: 16px;
+  font-size: 14px;
+  border-left: 4px solid #c62828;
+}
+
+mat-card-actions {
+  display: flex;
+  justify-content: center;
+  padding-top: 16px;
+
+  .full-width {
+    margin-bottom: 0;
+  }
+}
+
+.spinner {
+  display: inline-flex;
+  margin-right: 8px;
+}
+
+mat-form-field {
+  ::ng-deep {
+    .mat-form-field-focus-overlay {
+      background-color: rgba(102, 126, 234, 0.1);
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .login-container {
+    padding: 16px;
+  }
+
+  .login-card {
+    max-width: 100%;
+  }
+
+  .login-title {
+    font-size: 24px;
+  }
+}

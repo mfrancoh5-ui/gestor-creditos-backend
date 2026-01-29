@@ -5,8 +5,8 @@ import { RouterOutlet } from '@angular/router';
   selector: 'app-root',
   imports: [RouterOutlet],
   templateUrl: './app.html',
-  styleUrl: './app.scss'
+  styleUrls: ['./app.scss']
 })
-export class App {
+export class AppComponent {
   protected readonly title = signal('micartera-frontend');
 }

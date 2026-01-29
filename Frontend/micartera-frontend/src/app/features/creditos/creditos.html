@@ -1,1 +1,269 @@
-<p>creditos works!</p>
+<div class="creditos-container">
+  <!-- ================= HEADER ================= -->
+  <div class="page-header">
+    <div>
+      <h1>Gestión de Créditos</h1>
+      <p class="subtitle">Administra los créditos de tu cartera</p>
+    </div>
+
+    <button
+      mat-raised-button
+      color="primary"
+      (click)="abrirFormulario()"
+      [disabled]="loading"
+    >
+      <mat-icon>add_circle</mat-icon>
+      Nuevo Crédito
+    </button>
+  </div>
+
+  <!-- ================= FORMULARIO ================= -->
+  <mat-card *ngIf="showForm" class="form-card">
+    <mat-card-header>
+      <mat-card-title>Crear Nuevo Crédito</mat-card-title>
+    </mat-card-header>
+
+    <mat-card-content>
+      <form [formGroup]="creditoForm" (ngSubmit)="crearCredito()">
+        <div class="form-grid">
+          <!-- ================= Cliente (Autocomplete) ================= -->
+          <mat-form-field appearance="outline">
+            <mat-label>Cliente</mat-label>
+
+            <!-- Input visible (SIEMPRE string) -->
+            <input
+              matInput
+              type="text"
+              [formControl]="clienteSearchCtrl"
+              [matAutocomplete]="autoClientes"
+              placeholder="Escriba nombre o DPI..."
+              (blur)="onClienteBlur()"
+            />
+
+            <button
+              *ngIf="clienteSearchCtrl.value"
+              matSuffix
+              mat-icon-button
+              type="button"
+              aria-label="Limpiar"
+              (click)="limpiarCliente()"
+            >
+              <mat-icon>close</mat-icon>
+            </button>
+
+            <mat-autocomplete
+              #autoClientes="matAutocomplete"
+              (optionSelected)="onClienteSeleccionadoId($event.option.value)"
+            >
+              <mat-option *ngFor="let c of filteredClientes" [value]="c.id">
+                <div style="display:flex; flex-direction:column; line-height:1.2;">
+                  <span>{{ (c.nombres || '') }} {{ (c.apellidos || '') }}</span>
+                  <small style="opacity:.7;">DPI: {{ c.dpi || '—' }}</small>
+                </div>
+              </mat-option>
+
+              <mat-option *ngIf="filteredClientes.length === 0" disabled>
+                No hay coincidencias
+              </mat-option>
+            </mat-autocomplete>
+
+            <!-- Error real: el ID oculto es el que valida -->
+            <mat-error
+              *ngIf="
+                creditoForm.get('clienteId')?.invalid &&
+                (creditoForm.get('clienteId')?.touched || submitted)
+              "
+            >
+              Seleccione un cliente válido
+            </mat-error>
+          </mat-form-field>
+
+          <!-- Monto Prestado -->
+          <mat-form-field appearance="outline">
+            <mat-label>Monto Prestado (Q)</mat-label>
+            <input matInput type="number" formControlName="montoPrestado" />
+            <mat-error
+              *ngIf="
+                creditoForm.get('montoPrestado')?.invalid &&
+                (creditoForm.get('montoPrestado')?.touched || submitted)
+              "
+            >
+              Monto inválido (mínimo Q 100)
+            </mat-error>
+          </mat-form-field>
+
+          <!-- Cuota Fija -->
+          <mat-form-field appearance="outline">
+            <mat-label>Cuota Fija (Q)</mat-label>
+            <input matInput type="number" formControlName="cuotaFija" />
+            <mat-error
+              *ngIf="
+                creditoForm.get('cuotaFija')?.invalid &&
+                (creditoForm.get('cuotaFija')?.touched || submitted)
+              "
+            >
+              Cuota requerida (mínimo Q 1)
+            </mat-error>
+          </mat-form-field>
+
+          <!-- Número de Cuotas -->
+          <mat-form-field appearance="outline">
+            <mat-label>Número de Cuotas</mat-label>
+            <input matInput type="number" formControlName="numeroCuotas" />
+            <mat-error
+              *ngIf="
+                creditoForm.get('numeroCuotas')?.invalid &&
+                (creditoForm.get('numeroCuotas')?.touched || submitted)
+              "
+            >
+              Número inválido (mínimo 1)
+            </mat-error>
+          </mat-form-field>
+
+          <!-- Frecuencia -->
+          <mat-form-field appearance="outline">
+            <mat-label>Frecuencia</mat-label>
+            <mat-select formControlName="frecuencia">
+              <mat-option value="DAILY">Diaria</mat-option>
+              <mat-option value="BIWEEKLY">Quincenal</mat-option>
+              <mat-option value="MONTHLY">Mensual</mat-option>
+              <mat-option value="YEARLY">Anual</mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <!-- Fecha Inicio -->
+          <mat-form-field appearance="outline">
+            <mat-label>Fecha de Inicio</mat-label>
+            <input matInput type="date" formControlName="fechaInicio" />
+            <mat-error
+              *ngIf="
+                creditoForm.get('fechaInicio')?.invalid &&
+                (creditoForm.get('fechaInicio')?.touched || submitted)
+              "
+            >
+              Fecha requerida
+            </mat-error>
+          </mat-form-field>
+        </div>
+
+        <div class="form-actions">
+          <button mat-stroked-button type="button" (click)="cancelarFormulario()">
+            Cancelar
+          </button>
+
+          <button
+            mat-raised-button
+            color="primary"
+            type="submit"
+            [disabled]="creditoForm.invalid || loading"
+          >
+            Crear Crédito
+          </button>
+        </div>
+      </form>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- ================= LOADING ================= -->
+  <div *ngIf="loading" class="loading-spinner">
+    <mat-spinner diameter="48"></mat-spinner>
+    <p>Cargando créditos…</p>
+  </div>
+
+  <!-- ================= TABLA DESKTOP ================= -->
+  <mat-card *ngIf="!loading" class="table-card desktop-table">
+    <div class="table-wrapper">
+      <table mat-table [dataSource]="dataSource" class="creditos-table">
+        <!-- ID -->
+        <ng-container matColumnDef="id">
+          <th mat-header-cell *matHeaderCellDef>#</th>
+          <td mat-cell *matCellDef="let c">{{ c.id }}</td>
+        </ng-container>
+
+        <!-- Cliente -->
+        <ng-container matColumnDef="clienteId">
+          <th mat-header-cell *matHeaderCellDef>Cliente</th>
+          <td mat-cell *matCellDef="let c">
+            {{ obtenerNombreCliente(c.clienteId) }}
+          </td>
+        </ng-container>
+
+        <!-- Monto -->
+        <ng-container matColumnDef="montoPrestado">
+          <th mat-header-cell *matHeaderCellDef>Monto</th>
+          <td mat-cell *matCellDef="let c">Q {{ c.montoPrestado | number }}</td>
+        </ng-container>
+
+        <!-- Cuota -->
+        <ng-container matColumnDef="cuotaBase">
+          <th mat-header-cell *matHeaderCellDef>Cuota</th>
+          <td mat-cell *matCellDef="let c">Q {{ c.cuotaBase | number }}</td>
+        </ng-container>
+
+        <!-- Cuotas -->
+        <ng-container matColumnDef="numeroCuotas">
+          <th mat-header-cell *matHeaderCellDef>Cuotas</th>
+          <td mat-cell *matCellDef="let c">{{ c.numeroCuotas }}</td>
+        </ng-container>
+
+        <!-- Frecuencia -->
+        <ng-container matColumnDef="frecuencia">
+          <th mat-header-cell *matHeaderCellDef>Frecuencia</th>
+          <td mat-cell *matCellDef="let c">{{ c.frecuencia }}</td>
+        </ng-container>
+
+        <!-- Inicio -->
+        <ng-container matColumnDef="fechaInicio">
+          <th mat-header-cell *matHeaderCellDef>Inicio</th>
+          <td mat-cell *matCellDef="let c">
+            {{ c.fechaInicio | date: 'dd/MM/yyyy' }}
+          </td>
+        </ng-container>
+
+        <!-- Estado -->
+        <ng-container matColumnDef="estado">
+          <th mat-header-cell *matHeaderCellDef>Estado</th>
+          <td mat-cell *matCellDef="let c">
+            <span
+              class="status-badge"
+              [class.active]="c.estado === 'ACTIVE' || c.estado === 'ACTIVO'"
+              [class.pending]="c.estado === 'MORA' || c.estado === 'PENDIENTE'"
+              [class.closed]="c.estado === 'CANCELADO' || c.estado === 'CERRADO'"
+            >
+              {{ c.estado }}
+            </span>
+          </td>
+        </ng-container>
+
+        <!-- Acciones -->
+        <ng-container matColumnDef="acciones">
+          <th mat-header-cell *matHeaderCellDef>Acciones</th>
+          <td mat-cell *matCellDef="let c">
+            <button mat-icon-button matTooltip="Ver detalles" (click)="verDetalles(c)">
+              <mat-icon>visibility</mat-icon>
+            </button>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+
+        <tr class="no-data-row" *ngIf="dataSource.data.length === 0">
+          <td [attr.colspan]="displayedColumns.length">
+            <div class="no-data-message">
+              <mat-icon>credit_card</mat-icon>
+              <p>No hay créditos registrados</p>
+            </div>
+          </td>
+        </tr>
+      </table>
+    </div>
+
+    <mat-paginator
+      [length]="totalRegistros"
+      [pageSize]="pageSize"
+      [pageSizeOptions]="[5, 10, 25, 50]"
+      (page)="onPageChange($event)"
+    ></mat-paginator>
+  </mat-card>
+</div>

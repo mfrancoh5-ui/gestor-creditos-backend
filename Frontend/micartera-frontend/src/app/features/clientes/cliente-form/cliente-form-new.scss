@@ -1,0 +1,62 @@
+.form-container {
+  min-width: 400px;
+  max-width: 100%;
+  padding: 0;
+
+  @media (max-width: 600px) {
+    min-width: 100%;
+  }
+
+  h2 {
+    margin: 0 0 24px 0;
+    font-size: 20px;
+    font-weight: 600;
+  }
+
+  form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+}
+
+.full-width {
+  width: 100%;
+}
+
+textarea {
+  resize: vertical;
+  font-family: inherit;
+}
+
+mat-form-field {
+  ::ng-deep {
+    .mat-form-field-infix {
+      border-top: 1px solid #f0f0f0;
+      padding-bottom: 1em;
+    }
+  }
+}
+
+::ng-deep {
+  .mat-mdc-dialog-container {
+    .mat-mdc-dialog-title {
+      padding: 16px 24px 0 24px;
+    }
+
+    .mat-mdc-dialog-content {
+      padding: 24px;
+    }
+
+    .mat-mdc-dialog-actions {
+      padding: 16px 24px 24px 24px;
+      gap: 8px;
+    }
+  }
+}
+
+@media (max-width: 600px) {
+  .form-container {
+    min-width: 100%;
+  }
+}

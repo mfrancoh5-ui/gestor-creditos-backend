@@ -1,0 +1,73 @@
+<form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="login-container">
+  <mat-card class="login-card">
+    <mat-card-header>
+      <h1 class="login-title">Gestor de Créditos</h1>
+      <p class="login-subtitle">Inicia sesión para continuar</p>
+    </mat-card-header>
+
+    <mat-card-content>
+      <div *ngIf="error" class="error-message">
+        {{ error }}
+      </div>
+
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Email</mat-label>
+        <input
+          matInput
+          type="email"
+          formControlName="email"
+          placeholder="ejemplo@correo.com"
+          [disabled]="loading"
+        />
+        <mat-icon matSuffix>email</mat-icon>
+        <mat-error *ngIf="email?.hasError('required')">
+          El email es requerido
+        </mat-error>
+        <mat-error *ngIf="email?.hasError('email')">
+          Ingresa un email válido
+        </mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Contraseña</mat-label>
+        <input
+          matInput
+          [type]="hidePassword ? 'password' : 'text'"
+          formControlName="password"
+          placeholder="Ingresa tu contraseña"
+          [disabled]="loading"
+        />
+        <button
+          mat-icon-button
+          matSuffix
+          (click)="togglePasswordVisibility()"
+          type="button"
+          [disabled]="loading"
+        >
+          <mat-icon>{{ hidePassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+        </button>
+        <mat-error *ngIf="password?.hasError('required')">
+          La contraseña es requerida
+        </mat-error>
+        <mat-error *ngIf="password?.hasError('minlength')">
+          La contraseña debe tener al menos 6 caracteres
+        </mat-error>
+      </mat-form-field>
+    </mat-card-content>
+
+    <mat-card-actions>
+      <button
+        mat-raised-button
+        color="primary"
+        class="full-width"
+        type="submit"
+        [disabled]="loginForm.invalid || loading"
+      >
+        <mat-icon *ngIf="loading" class="spinner">
+          <mat-spinner diameter="20"></mat-spinner>
+        </mat-icon>
+        {{ loading ? 'Iniciando sesión...' : 'Iniciar Sesión' }}
+      </button>
+    </mat-card-actions>
+  </mat-card>
+</form>

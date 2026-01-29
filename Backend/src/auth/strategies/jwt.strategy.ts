@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
@@ -16,10 +16,17 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     private readonly config: ConfigService<Env>,
     private readonly prisma: PrismaService,
   ) {
+    const secret = config.get('JWT_SECRET') ?? '';
+
+    // ✅ Falla temprano si falta el secreto (mejor que un bug silencioso)
+    if (!secret) {
+      throw new Error('JWT_SECRET no está definido en el entorno (.env)');
+    }
+
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
-      secretOrKey: config.get('JWT_SECRET'),
+      secretOrKey: secret,
     });
   }
 
@@ -29,7 +36,8 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     });
 
     if (!usuario || !usuario.activo) {
-      return null;
+      // ✅ Passport interpreta null/false como no autorizado
+      throw new UnauthorizedException('Token inválido o usuario inactivo');
     }
 
     return usuario;

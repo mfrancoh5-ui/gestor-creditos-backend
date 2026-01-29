@@ -1,43 +1,47 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
+import { ApiService } from './api.service';
+import { Observable } from 'rxjs';
+import { Cliente, ApiResponse, PaginatedResponse } from '../models';
 
-export type Cliente = {
-  id: number;
+export interface CrearClienteDto {
   nombres: string;
   apellidos: string;
-  dpi: string;
-  telefonos: string[];
-  direcciones: string[];
-  creadoEn: Date;
-};
+  telefono?: string;
+  dni?: string;
+  direccion?: string;
+}
+
+export type ActualizarClienteDto = Partial<CrearClienteDto>;
 
 @Injectable({ providedIn: 'root' })
 export class ClientesService {
-  private readonly _clientes$ = new BehaviorSubject<Cliente[]>([
-    {
-      id: 1,
-      nombres: 'Juan',
-      apellidos: 'Pérez',
-      dpi: '1234567890101',
-      telefonos: ['+502 5555-1111'],
-      direcciones: ['Zacapa, Guatemala'],
-      creadoEn: new Date(),
-    },
-  ]);
+  constructor(private apiService: ApiService) {}
 
-  clientes$ = this._clientes$.asObservable();
-
-  get snapshot(): Cliente[] {
-    return this._clientes$.value;
+  listarClientes(
+    page: number = 1,
+    pageSize: number = 10
+  ): Observable<ApiResponse<PaginatedResponse<Cliente>>> {
+    // ✅ Envíe exactamente lo que el backend entiende
+    // (si el backend usa pageSize, mande pageSize; si usa limit, mande limit)
+    return this.apiService.get<ApiResponse<PaginatedResponse<Cliente>>>('/clientes', {
+      page,
+      pageSize,
+    });
   }
 
-  crear(cliente: Omit<Cliente, 'id' | 'creadoEn'>) {
-    const nextId = (this.snapshot.at(-1)?.id ?? 0) + 1;
-    const nuevo: Cliente = { id: nextId, creadoEn: new Date(), ...cliente };
-    this._clientes$.next([...this.snapshot, nuevo]);
+  obtenerCliente(id: number): Observable<ApiResponse<Cliente>> {
+    return this.apiService.get<ApiResponse<Cliente>>(`/clientes/${id}`);
   }
 
-  eliminar(id: number) {
-    this._clientes$.next(this.snapshot.filter(c => c.id !== id));
+  crearCliente(dto: CrearClienteDto): Observable<ApiResponse<Cliente>> {
+    return this.apiService.post<ApiResponse<Cliente>>('/clientes', dto);
+  }
+
+  actualizarCliente(id: number, dto: ActualizarClienteDto): Observable<ApiResponse<Cliente>> {
+    return this.apiService.patch<ApiResponse<Cliente>>(`/clientes/${id}`, dto);
+  }
+
+  eliminarCliente(id: number): Observable<any> {
+    return this.apiService.delete<any>(`/clientes/${id}`);
   }
 }

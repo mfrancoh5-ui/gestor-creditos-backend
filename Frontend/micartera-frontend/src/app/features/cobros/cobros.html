@@ -1,0 +1,33 @@
+<h1>Cobros del día {{ fechaSeleccionada }}</h1>
+
+<div *ngIf="loading">Cargando cuotas…</div>
+
+<div *ngIf="!loading && cuotas.length === 0">
+  No hay cuotas para este día
+</div>
+
+<div class="cuotas">
+  <div class="cuota-card" *ngFor="let c of cuotas">
+    <div>
+      <strong>{{ c.cliente.nombres }} {{ c.cliente.apellidos }}</strong>
+      <small>DPI: {{ c.cliente.dni }}</small>
+    </div>
+
+    <div>
+      Crédito #{{ c.creditoId }} – Cuota {{ c.numero }}
+    </div>
+
+    <div>
+      Vence: {{ c.fechaVenc | date: 'shortDate' }}
+    </div>
+
+    <div>
+      Monto: Q{{ c.monto }} |
+      Pendiente: <strong>Q{{ c.saldoCuota }}</strong>
+    </div>
+
+    <button (click)="abrirCobro(c)" [disabled]="c.saldoCuota <= 0">
+      Cobrar
+    </button>
+  </div>
+</div>

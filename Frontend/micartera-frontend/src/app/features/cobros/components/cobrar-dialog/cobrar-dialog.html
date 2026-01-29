@@ -1,0 +1,118 @@
+<!-- components/cobrar-dialog/cobrar-dialog.html -->
+<div class="dialog">
+  <div class="header">
+    <h2>Cobrar cuota</h2>
+    <p class="subtitle">Registro de cobro operativo (rápido y sin fricción)</p>
+  </div>
+
+  <div class="card resumen">
+    <div class="row">
+      <div class="col">
+        <div class="label">Cliente</div>
+        <div class="value">
+          {{ cuota.cliente?.nombres }} {{ cuota.cliente?.apellidos }}
+        </div>
+      </div>
+
+      <div class="col">
+        <div class="label">Crédito</div>
+        <div class="value">#{{ cuota.creditoId }}</div>
+      </div>
+
+      <div class="col">
+        <div class="label">Cuota</div>
+        <div class="value">#{{ cuota.numero }}</div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col">
+        <div class="label">Vence</div>
+        <div class="value">{{ cuota.fechaVenc | date: 'dd/MM/yyyy' }}</div>
+      </div>
+
+      <div class="col">
+        <div class="label">Estado</div>
+        <div class="value">
+          <span
+            class="badge"
+            [ngClass]="{
+              ok: cuota.estado === 'PENDING',
+              mora: cuota.estado === 'LATE',
+              pagada: cuota.estado === 'PAID'
+            }"
+          >
+            {{ cuota.estado }}
+          </span>
+        </div>
+      </div>
+
+      <div class="col">
+        <div class="label">Pendiente</div>
+        <div class="value strong">Q{{ cuota.saldoCuota }}</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="quick-actions">
+    <button type="button" class="qa-btn" (click)="setPagoCompleto()">Pago completo</button>
+    <button type="button" class="qa-btn" (click)="setPagoParcial()">Pago parcial</button>
+    <button type="button" class="qa-btn danger" (click)="setNoPagoMora()">No pagó (mora)</button>
+  </div>
+
+  <div class="card form">
+    <div class="field">
+      <label class="label">Monto a cobrar</label>
+      <input
+        type="number"
+        class="input"
+        [(ngModel)]="monto"
+        (ngModelChange)="onMontoChange()"
+        [min]="0"
+        [max]="cuota.saldoCuota"
+        placeholder="Ingrese monto"
+      />
+
+      <small class="hint">
+        Sugerido: Q{{ cuota.saldoCuota }} · Máximo permitido: Q{{ cuota.saldoCuota }}
+      </small>
+
+      <div class="error" *ngIf="montoError">{{ montoError }}</div>
+    </div>
+
+    <div class="field">
+      <label class="label">Método</label>
+      <select class="input" [(ngModel)]="metodo">
+        <option value="EFECTIVO">Efectivo</option>
+        <option value="TRANSFERENCIA">Transferencia</option>
+        <option value="TARJETA">Tarjeta</option>
+      </select>
+    </div>
+
+    <div class="field" *ngIf="metodo !== 'EFECTIVO'">
+      <label class="label">Referencia (opcional)</label>
+      <input class="input" [(ngModel)]="referencia" placeholder="No. transacción / autorización" />
+    </div>
+
+    <div class="field">
+      <label class="label">Observación (opcional)</label>
+      <textarea
+        class="input textarea"
+        [(ngModel)]="observacion"
+        placeholder="Notas del cobro (ej. acuerdo, parcial, etc.)"
+      ></textarea>
+    </div>
+  </div>
+
+  <div class="acciones">
+    <button type="button" class="btn ghost" (click)="cancelar()">Cancelar</button>
+    <button
+      type="button"
+      class="btn primary"
+      (click)="confirmar()"
+      [disabled]="!!montoError || (cuota.estado === 'PAID')"
+    >
+      Registrar cobro
+    </button>
+  </div>
+</div>

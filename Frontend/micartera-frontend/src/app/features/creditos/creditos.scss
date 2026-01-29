@@ -1,0 +1,439 @@
+/* ==========================================================================
+   Créditos — Responsive real (Móvil → 4K) + Angular Material (MDC)
+   ========================================================================== */
+
+:host {
+  display: block;
+  width: 100%;
+}
+
+/* Tokens básicos (sin pelearse con Material 3) */
+.creditos-container {
+  /* Layout */
+  width: min(1400px, 100%);
+  margin: 0 auto;
+  padding: clamp(10px, 1.6vw, 20px);
+
+  /* Look & feel */
+  --radius: 16px;
+  --radius-sm: 12px;
+  --shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+  --shadow-soft: 0 8px 18px rgba(0, 0, 0, 0.06);
+
+  --border: rgba(0, 0, 0, 0.08);
+  --muted: rgba(0, 0, 0, 0.62);
+  --muted-2: rgba(0, 0, 0, 0.50);
+
+  /* Material vars disponibles */
+  --surface: var(--mat-sys-surface, #fff);
+  --surface-2: var(--mat-sys-surface-container, #f6f6f6);
+  --surface-3: var(--mat-sys-surface-container-high, #f0f0f0);
+  --on-surface: var(--mat-sys-on-surface, #111);
+  --primary: var(--mat-sys-primary, #1976d2);
+  --primary-2: color-mix(in srgb, var(--primary) 14%, transparent);
+
+  color: var(--on-surface);
+}
+
+/* --------------------------------
+   Header
+----------------------------------- */
+.page-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 14px;
+
+  h1 {
+    margin: 0;
+    font-weight: 750;
+    letter-spacing: -0.02em;
+    font-size: clamp(1.25rem, 1.7vw, 1.7rem);
+    line-height: 1.15;
+  }
+
+  .subtitle {
+    margin: 6px 0 0;
+    color: var(--muted);
+    font-size: clamp(0.88rem, 1.2vw, 0.98rem);
+  }
+
+  /* Botón "Nuevo Crédito" */
+  button[mat-raised-button] {
+    border-radius: 999px;
+    box-shadow: var(--shadow-soft);
+    white-space: nowrap;
+
+    mat-icon {
+      margin-right: 8px;
+    }
+  }
+}
+
+/* En móviles, apila */
+@media (max-width: 640px) {
+  .page-header {
+    flex-direction: column;
+    align-items: stretch;
+
+    button[mat-raised-button] {
+      width: 100%;
+      justify-content: center;
+    }
+  }
+}
+
+/* --------------------------------
+   Cards base (Mat MDC)
+----------------------------------- */
+.form-card,
+.table-card,
+.credito-card,
+.paginator-card {
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-soft);
+  border: 1px solid var(--border);
+  background: var(--surface);
+}
+
+/* MatCard header/title */
+:host ::ng-deep .creditos-container .mat-mdc-card-header {
+  padding: 16px 16px 0;
+}
+:host ::ng-deep .creditos-container .mat-mdc-card-title {
+  font-weight: 720;
+  letter-spacing: -0.01em;
+}
+
+/* Contenido card */
+:host ::ng-deep .creditos-container .mat-mdc-card-content {
+  padding: 16px;
+}
+
+/* --------------------------------
+   Formulario
+----------------------------------- */
+.form-card {
+  margin-bottom: 14px;
+  overflow: hidden;
+
+  /* un pequeño fondo para separar */
+  background: linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--primary) 6%, transparent) 0%,
+      transparent 55%
+    ),
+    var(--surface);
+}
+
+/* Grid del form: responsive */
+.form-grid {
+  display: grid;
+  gap: 12px;
+
+  /* Desktop: 3 columnas si cabe */
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+/* Tablet: 2 columnas */
+@media (max-width: 980px) {
+  .form-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* Móvil: 1 columna */
+@media (max-width: 640px) {
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Asegurar que los form fields ocupen bien */
+:host ::ng-deep .creditos-container .mat-mdc-form-field {
+  width: 100%;
+}
+
+/* Mejor “tacto” del outline (sin romper theme) */
+:host ::ng-deep .creditos-container .mat-mdc-text-field-wrapper {
+  border-radius: 14px;
+}
+:host ::ng-deep .creditos-container .mdc-notched-outline__leading,
+:host ::ng-deep .creditos-container .mdc-notched-outline__notch,
+:host ::ng-deep .creditos-container .mdc-notched-outline__trailing {
+  border-color: color-mix(in srgb, var(--primary) 10%, var(--border));
+}
+
+/* Acciones del formulario */
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 14px;
+
+  button {
+    border-radius: 999px;
+    min-width: 140px;
+  }
+}
+
+@media (max-width: 640px) {
+  .form-actions {
+    flex-direction: column;
+
+    button {
+      width: 100%;
+      min-width: unset;
+    }
+  }
+}
+
+/* --------------------------------
+   Loading
+----------------------------------- */
+.loading-spinner {
+  display: grid;
+  place-items: center;
+  gap: 10px;
+  padding: 26px 14px;
+  color: var(--muted);
+
+  p {
+    margin: 0;
+    font-size: 0.95rem;
+  }
+}
+
+/* --------------------------------
+   Tabla (Desktop/Tablet)
+----------------------------------- */
+.table-card {
+  overflow: hidden;
+}
+
+/* Wrapper para scroll horizontal en pantallas pequeñas */
+.table-wrapper {
+  width: 100%;
+  overflow: auto;
+}
+
+/* Estilo tabla Material */
+:host ::ng-deep .creditos-container .mat-mdc-table {
+  width: 100%;
+  background: transparent;
+}
+
+/* Head */
+:host ::ng-deep .creditos-container .mat-mdc-header-row {
+  background: color-mix(in srgb, var(--primary) 6%, transparent);
+}
+:host ::ng-deep .creditos-container .mat-mdc-header-cell {
+  font-weight: 720;
+  color: color-mix(in srgb, var(--on-surface) 92%, transparent);
+  border-bottom-color: var(--border);
+  white-space: nowrap;
+}
+
+/* Cells */
+:host ::ng-deep .creditos-container .mat-mdc-row:hover .mat-mdc-cell {
+  background: color-mix(in srgb, var(--primary) 6%, transparent);
+}
+:host ::ng-deep .creditos-container .mat-mdc-cell {
+  border-bottom-color: var(--border);
+  color: color-mix(in srgb, var(--on-surface) 92%, transparent);
+}
+
+/* Alinear columna de monto */
+.monto {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Paginator */
+:host ::ng-deep .creditos-container .mat-mdc-paginator {
+  border-top: 1px solid var(--border);
+  background: var(--surface);
+}
+
+/* --------------------------------
+   Status badge
+----------------------------------- */
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 720;
+  letter-spacing: 0.02em;
+  border: 1px solid var(--border);
+  background: var(--surface-2);
+  color: var(--muted);
+  white-space: nowrap;
+
+  &.active {
+    background: color-mix(in srgb, #16a34a 14%, transparent);
+    border-color: color-mix(in srgb, #16a34a 26%, var(--border));
+    color: #166534;
+  }
+
+  &.pending {
+    background: color-mix(in srgb, #f59e0b 18%, transparent);
+    border-color: color-mix(in srgb, #f59e0b 30%, var(--border));
+    color: #92400e;
+  }
+
+  &.closed {
+    background: color-mix(in srgb, #ef4444 16%, transparent);
+    border-color: color-mix(in srgb, #ef4444 30%, var(--border));
+    color: #991b1b;
+  }
+}
+
+/* --------------------------------
+   No data
+----------------------------------- */
+.no-data-row td {
+  padding: 18px 12px;
+}
+.no-data-message {
+  display: grid;
+  justify-items: center;
+  gap: 8px;
+  color: var(--muted);
+  padding: 14px 0;
+
+  mat-icon {
+    transform: scale(1.1);
+    opacity: 0.9;
+  }
+
+  p {
+    margin: 0;
+    font-size: 0.95rem;
+  }
+}
+
+/* --------------------------------
+   Responsive: ocultar tabla / mostrar cards
+----------------------------------- */
+.desktop-table {
+  display: block;
+}
+.mobile-cards {
+  display: none;
+}
+
+/* En móvil: tabla fuera, cards dentro */
+@media (max-width: 760px) {
+  .desktop-table {
+    display: none;
+  }
+  .mobile-cards {
+    display: block;
+    margin-top: 12px;
+  }
+}
+
+/* --------------------------------
+   Mobile cards
+----------------------------------- */
+.mobile-cards {
+  display: grid;
+  gap: 12px;
+}
+
+.credito-card {
+  padding: 14px;
+}
+
+/* Top */
+.credito-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.credito-title {
+  min-width: 0;
+}
+
+.credito-id {
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  font-size: 0.95rem;
+  color: color-mix(in srgb, var(--on-surface) 92%, transparent);
+}
+
+.credito-cliente {
+  margin-top: 4px;
+  font-size: 0.92rem;
+  color: var(--muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 48vw;
+}
+
+/* Grid */
+.credito-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px 12px;
+  padding: 10px;
+  border-radius: var(--radius-sm);
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+}
+
+.item .label {
+  font-size: 0.78rem;
+  color: var(--muted-2);
+}
+.item .value {
+  margin-top: 2px;
+  font-weight: 750;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Actions */
+.credito-actions {
+  margin-top: 12px;
+  display: flex;
+  justify-content: flex-end;
+
+  button {
+    border-radius: 999px;
+    width: 100%;
+    justify-content: center;
+
+    mat-icon {
+      margin-right: 8px;
+    }
+  }
+}
+
+/* Paginator card mobile */
+.paginator-card {
+  overflow: hidden;
+}
+
+/* --------------------------------
+   Accesibilidad + toques finales
+----------------------------------- */
+:host ::ng-deep .creditos-container button.mat-mdc-button-base:focus-visible {
+  outline: 3px solid var(--primary-2);
+  outline-offset: 2px;
+  border-radius: 999px;
+}
+
+/* Micro-optimización: si la tabla se hace muy ancha, que no se rompa feo */
+@media (max-width: 980px) {
+  .table-wrapper {
+    padding-bottom: 6px;
+  }
+}

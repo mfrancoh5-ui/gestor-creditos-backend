@@ -1,66 +1,82 @@
 <mat-sidenav-container class="shell">
-
-  <!-- ✅ SIDENAV: solo desktop -->
-    <mat-sidenav
-        class="sidenav"
-        mode="side"
-        opened
-        class="desktop-only"
-    >
-
+  <!-- SIDENAV: solo desktop -->
+  <mat-sidenav
+    class="sidenav desktop-only"
+    mode="side"
+    [opened]="sidenavOpen"
+    (opened)="sidenavOpen = true"
+    (closed)="sidenavOpen = false"
+  >
     <div class="brand">
-      <div class="logo">MC</div>
+      <div class="logo">GC</div>
       <div class="brand-text">
-        <div class="title">MiCartera</div>
-        <div class="subtitle">Gestor de Créditos</div>
+        <div class="title">Gestor</div>
+        <div class="subtitle">Créditos</div>
       </div>
     </div>
 
     <mat-nav-list>
-      <a mat-list-item routerLink="/dashboard" routerLinkActive="active">
-        <mat-icon>dashboard</mat-icon>
-        <span>Dashboard</span>
-      </a>
-
-      <a mat-list-item routerLink="/clientes" routerLinkActive="active">
-        <mat-icon>people</mat-icon>
-        <span>Clientes</span>
-      </a>
-
-      <a mat-list-item routerLink="/creditos" routerLinkActive="active">
-        <mat-icon>request_quote</mat-icon>
-        <span>Créditos</span>
-      </a>
-
-      <a mat-list-item routerLink="/pagos" routerLinkActive="active">
-        <mat-icon>payments</mat-icon>
-        <span>Pagos</span>
+      <a
+        *ngFor="let item of menuItems"
+        mat-list-item
+        [routerLink]="item.route"
+        routerLinkActive="active"
+      >
+        <mat-icon matListItemIcon>{{ item.icon }}</mat-icon>
+        <span matListItemTitle>{{ item.label }}</span>
       </a>
     </mat-nav-list>
+
+    <div class="sidenav-footer">
+      <mat-divider></mat-divider>
+      <div class="user-info">
+        <mat-icon>account_circle</mat-icon>
+        <div class="user-details">
+          <p class="user-email">{{ currentUser?.email }}</p>
+          <p class="user-role">{{ currentUser?.rol }}</p>
+        </div>
+      </div>
+      <button mat-stroked-button class="logout-btn" (click)="logout()">
+        <mat-icon>logout</mat-icon>
+        Salir
+      </button>
+    </div>
   </mat-sidenav>
 
-  <mat-sidenav-content class="content">
-
-    <!-- ✅ TOPBAR (desktop + móvil). En móvil la hacemos compacta -->
-    <mat-toolbar class="topbar" color="primary" [class.mobile]="(isMobile$ | async)">
-      <span class="app-title">MiCartera</span>
-      <span class="spacer"></span>
-
-      <button mat-icon-button aria-label="Notificaciones">
-        <mat-icon>notifications</mat-icon>
+  <mat-sidenav-content>
+    <!-- TOOLBAR -->
+    <mat-toolbar color="primary">
+      <button
+        mat-icon-button
+        (click)="toggleSidenav()"
+        class="desktop-only"
+      >
+        <mat-icon>menu</mat-icon>
       </button>
-      <button mat-icon-button aria-label="Perfil">
+
+      <span class="toolbar-spacer"></span>
+
+      <!-- User Menu Mobile -->
+      <button mat-icon-button [matMenuTriggerFor]="userMenu" class="mobile-only">
         <mat-icon>account_circle</mat-icon>
       </button>
+
+      <mat-menu #userMenu="matMenu">
+        <div class="menu-header">
+          <p>{{ currentUser?.email }}</p>
+          <small>{{ currentUser?.rol }}</small>
+        </div>
+        <mat-divider></mat-divider>
+        <button mat-menu-item (click)="logout()">
+          <mat-icon>logout</mat-icon>
+          <span>Salir</span>
+        </button>
+      </mat-menu>
     </mat-toolbar>
 
-    <!-- ✅ CONTENT: en móvil agregamos padding abajo por el bottom-nav -->
-    <main class="page" [class.has-bottom-nav]="(isMobile$ | async)">
+    <!-- CONTENT -->
+    <div class="main-content">
       <router-outlet></router-outlet>
-    </main>
-
-    <!-- ✅ BOTTOM NAV: SOLO móvil -->
-    <app-bottom-nav class="mobile-only"></app-bottom-nav>
-
+    </div>
   </mat-sidenav-content>
 </mat-sidenav-container>

@@ -1,67 +1,110 @@
-<h2 mat-dialog-title>Nuevo cliente</h2>
+<div mat-dialog-content class="form-container">
+  <h2 mat-dialog-title>
+    {{ isEditMode ? 'Editar Cliente' : 'Crear Nuevo Cliente' }}
+  </h2>
 
-<div mat-dialog-content class="content">
-  <form [formGroup]="form" class="grid">
-    <mat-form-field appearance="outline">
+  <form [formGroup]="form" (ngSubmit)="onSubmit()">
+    <!-- NOMBRES -->
+    <mat-form-field appearance="outline" class="full-width">
       <mat-label>Nombres</mat-label>
-      <input matInput formControlName="nombres" />
+      <input
+        matInput
+        formControlName="nombres"
+        placeholder="Ej: Juan Carlos"
+        required
+      />
+      <mat-icon matSuffix>person</mat-icon>
+      <mat-error *ngIf="nombres?.hasError('required')">
+        Los nombres son requeridos
+      </mat-error>
+      <mat-error *ngIf="nombres?.hasError('minlength')">
+        Debe tener al menos 2 caracteres
+      </mat-error>
+      <mat-error *ngIf="nombres?.hasError('maxlength')">
+        Máximo 120 caracteres
+      </mat-error>
     </mat-form-field>
 
-    <mat-form-field appearance="outline">
+    <!-- APELLIDOS -->
+    <mat-form-field appearance="outline" class="full-width">
       <mat-label>Apellidos</mat-label>
-      <input matInput formControlName="apellidos" />
+      <input
+        matInput
+        formControlName="apellidos"
+        placeholder="Ej: Pérez López"
+        required
+      />
+      <mat-icon matSuffix>badge</mat-icon>
+      <mat-error *ngIf="apellidos?.hasError('required')">
+        Los apellidos son requeridos
+      </mat-error>
+      <mat-error *ngIf="apellidos?.hasError('minlength')">
+        Debe tener al menos 2 caracteres
+      </mat-error>
+      <mat-error *ngIf="apellidos?.hasError('maxlength')">
+        Máximo 120 caracteres
+      </mat-error>
     </mat-form-field>
 
-    <mat-form-field appearance="outline" class="full">
-      <mat-label>DPI (13 dígitos)</mat-label>
-      <input matInput formControlName="dpi" maxlength="13" />
+    <!-- DNI (opcional) -->
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>DNI/Cédula (opcional)</mat-label>
+      <input
+        matInput
+        formControlName="dni"
+        placeholder="Ej: 12345678"
+      />
+      <mat-icon matSuffix>credit_card</mat-icon>
+      <mat-error *ngIf="dni?.hasError('pattern')">
+        El DNI debe contener solo números (1-30 dígitos)
+      </mat-error>
+      <mat-error *ngIf="dni?.hasError('maxlength')">
+        Máximo 30 caracteres
+      </mat-error>
     </mat-form-field>
 
-    <div class="full block">
-      <div class="block-title">
-        Teléfonos
-        <button mat-stroked-button type="button" (click)="addTelefono()">
-          <mat-icon>add</mat-icon> Agregar
-        </button>
-      </div>
+    <!-- TELÉFONO (opcional) -->
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Teléfono (opcional)</mat-label>
+      <input
+        matInput
+        formControlName="telefono"
+        placeholder="Ej: +502 5555-1234"
+      />
+      <mat-icon matSuffix>phone</mat-icon>
+      <mat-error *ngIf="telefono?.hasError('maxlength')">
+        Máximo 30 caracteres
+      </mat-error>
+    </mat-form-field>
 
-      <div formArrayName="telefonos" class="stack">
-        <div class="row" *ngFor="let t of telefonos.controls; let i = index">
-          <mat-form-field appearance="outline" class="grow">
-            <mat-label>Teléfono {{ i + 1 }}</mat-label>
-            <input matInput [formControlName]="i" />
-          </mat-form-field>
-          <button mat-icon-button type="button" (click)="removeTelefono(i)" [disabled]="telefonos.length===1">
-            <mat-icon>delete</mat-icon>
-          </button>
-        </div>
-      </div>
-    </div>
+    <!-- DIRECCIÓN (opcional) -->
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Dirección (opcional)</mat-label>
+      <textarea
+        matInput
+        formControlName="direccion"
+        placeholder="Ej: Calle Principal 123, Zacapa"
+        rows="3"
+      ></textarea>
+      <mat-icon matSuffix>location_on</mat-icon>
+      <mat-error *ngIf="direccion?.hasError('maxlength')">
+        Máximo 255 caracteres
+      </mat-error>
+    </mat-form-field>
 
-    <div class="full block">
-      <div class="block-title">
-        Direcciones
-        <button mat-stroked-button type="button" (click)="addDireccion()">
-          <mat-icon>add</mat-icon> Agregar
-        </button>
-      </div>
+    <div mat-dialog-actions align="end">
+      <button mat-stroked-button type="button" (click)="onCancel()">
+        Cancelar
+      </button>
 
-      <div formArrayName="direcciones" class="stack">
-        <div class="row" *ngFor="let d of direcciones.controls; let i = index">
-          <mat-form-field appearance="outline" class="grow">
-            <mat-label>Dirección {{ i + 1 }}</mat-label>
-            <input matInput [formControlName]="i" />
-          </mat-form-field>
-          <button mat-icon-button type="button" (click)="removeDireccion(i)" [disabled]="direcciones.length===1">
-            <mat-icon>delete</mat-icon>
-          </button>
-        </div>
-      </div>
+      <button
+        mat-raised-button
+        color="primary"
+        type="submit"
+        [disabled]="form.invalid"
+      >
+        {{ isEditMode ? 'Actualizar' : 'Crear' }} Cliente
+      </button>
     </div>
   </form>
-</div>
-
-<div mat-dialog-actions align="end">
-  <button mat-button (click)="cerrar()">Cancelar</button>
-  <button mat-flat-button color="primary" (click)="guardar()">Guardar</button>
 </div>
